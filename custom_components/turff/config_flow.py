@@ -1,9 +1,10 @@
 from homeassistant import config_entries
+from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 
-from .const import CONF_PASSWORD, CONF_USERNAME, DOMAIN
+from .const import DOMAIN
 from .turff import Turff
 
 AUTH_SCHEMA = vol.Schema(

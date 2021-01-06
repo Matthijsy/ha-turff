@@ -1,7 +1,8 @@
+from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity import Entity
 
-from .const import CONF_PASSWORD, CONF_USERNAME, DOMAIN
+from .const import DOMAIN
 from .turff import Turff
 
 
