@@ -1,0 +1,17 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "username": "Turff Username",
+          "password": "Turff Password"
+        },
+        "description": "Enter your Turff credentials.",
+        "title": "Authentication"
+      }
+    },
+    "error": {
+      "invalid_credentials": "Credentials are invalid"
+    }
+  }
+}

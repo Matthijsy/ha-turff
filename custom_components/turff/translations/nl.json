@@ -1,0 +1,17 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "username": "Turff gebruikersnaam",
+          "password": "Turff wachtwoord"
+        },
+        "description": "Voer je Turff inloggegevens in.",
+        "title": "Authenticatie"
+      }
+    },
+    "error": {
+      "invalid_credentials": "Inloggegevens zijn verkeerd"
+    }
+  }
+}

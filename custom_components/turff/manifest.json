@@ -1,0 +1,9 @@
+{
+  "codeowners": ["@matthijsy"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/matthijsy/ha-turff",
+  "domain": "turff",
+  "name": "Turff",
+  "requirements": []
+}
