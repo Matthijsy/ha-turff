@@ -1,6 +1,7 @@
 import asyncio
 import json
 import socket
+import datetime
 
 import aiohttp
 import async_timeout
@@ -9,6 +10,7 @@ from yarl import URL
 from .const import API_HOST
 from .exceptions import TurffConnectionError, TurffCredentialsError, TurffError
 
+REQUEST_LIMIT = 2
 
 class Turff:
     def __init__(
@@ -113,6 +115,23 @@ class Turff:
 
         return balance_by_user
 
+    async def get_consumption_history(self, product_id, days=31):
+        if not self.connected:
+            await self._connect()
+
+        consumption_by_user = await self._parse_consumption_list(product_id, days)
+        consumption_by_user = list(consumption_by_user.values())
+
+        # Add week and month values
+        if days >= 7:
+            for u in consumption_by_user:
+                u['week'] = (sum(u[i] for i in range(7)))
+
+                if days >= 31:
+                    u['month'] = (sum(u[i] for i in range(31)))
+
+        return consumption_by_user
+
     async def _get_house(self):
         if not self.connected:
             await self._connect()
@@ -141,9 +160,40 @@ class Turff:
         if (await response.text()) == "Inlog gegevens kloppen niet":
             raise TurffCredentialsError("Turff Credentials Invalid")
 
-        self.cookie = response.headers["Set-Cookie"]
+        self.cookie = response.cookies
 
     async def _set_house_id(self):
         response = await self._request("api/house", method="GET")
 
         self.house_id = response["houses"][0]["UID"]
+
+    async def _parse_consumption_list(self, product_id, days):
+        today = datetime.date.today()
+        consumption_by_user = {}
+        offset = 0
+
+        while True:
+            response = await self._consumption_request(product_id, offset)
+            for u in response:
+                name = u['alias'] or u['groupName']
+                if name not in consumption_by_user:
+                    consumption_by_user[name] = {i: 0 for i in range(days)}
+                    consumption_by_user[name]['name'] = name
+
+                u_date = datetime.datetime.strptime(u['time_stamp'], '%Y-%m-%dT%H:%M:%S.%fZ').date()
+                diff = (today - u_date).days
+
+                # If we reached the limit
+                if diff >= days:
+                    return consumption_by_user
+
+                consumption_by_user[name][diff] += u['amount']
+
+            offset += REQUEST_LIMIT
+
+
+
+    async def _consumption_request(self, product_id, offset=0):
+        return await self._request(
+            f"api/tablet/{self.house_id}/log", data={"itemUID": product_id, "limit": REQUEST_LIMIT, "offset": offset}
+        )
