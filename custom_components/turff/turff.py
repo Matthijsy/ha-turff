@@ -175,6 +175,9 @@ class Turff:
         while True:
             response = await self._consumption_request(product_id, offset)
             for u in response:
+                if u['artificial']: # if this was done via the website, so when new beer is bought
+                    continue
+
                 name = u['alias'] or u['groupName']
                 if name not in consumption_by_user:
                     consumption_by_user[name] = {i: 0 for i in range(days)}
